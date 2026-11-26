@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-26T14:18:54.135627+01:00",
-  "updated_label": "26.11.2026 14:18",
+  "updated_at": "2026-11-26T14:40:15.924342+01:00",
+  "updated_label": "26.11.2026 14:40",
   "date": "26.11.2026",
   "restaurants": [
     {
@@ -125,7 +125,7 @@
               "price": "195 Kč / 165 Kč (vegetariánská varianta)"
             },
             {
-              "name": "Specialita dne: Kuřecí prso - bramborová kaše, pancetta, lišky, cuketa, dýňové chipsy a rybízová omáčka 180g",
+              "name": "Specialita dne: Kuřecí prso - bramborová kaše, pancetta, lišky, cuketa, dýňové chipsy a rybízová omáčka 1,7,10 180g",
               "price": "289 Kč"
             }
           ]
@@ -278,19 +278,61 @@
               "price": "98 Kč"
             }
           ]
-        },
+        }
+      ],
+      "ok": true,
+      "status": "Menu načteno (12 položek)",
+      "error": ""
+    },
+    {
+      "name": "Mexická Holešovice",
+      "url": "https://www.mexickaholesovice.cz/",
+      "sections": [],
+      "ok": false,
+      "status": "Načtení menu se nezdařilo",
+      "error": "ValueError: Na hlavní stránce Mexické nebyla nalezena sekce poledního menu"
+    },
+    {
+      "name": "Čtyrka",
+      "url": "https://www.ctyr-ka.cz/",
+      "sections": [
         {
-          "title": "Nápoje",
+          "title": "Polévka",
           "items": [
             {
-              "name": "0,5l - PAULANER WEISSBIER NEALKOHOLICKÉ (německé pšeničné pivo)",
-              "price": "58 Kč"
+              "name": "Bramborový krém s parmazánem",
+              "price": "55 Kč / 65 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Hlavní jídla",
+          "items": [
+            {
+              "name": "Náš burger, hovězí krk, slanina, čedar, rajče, okurka, salát, chilli majonéza, hranolky",
+              "price": "205 Kč"
+            },
+            {
+              "name": "Kuřecí supreme, zeleninová rýže, tymiánová omáčka",
+              "price": "198 Kč"
+            },
+            {
+              "name": "Pomalu pečený bůček na černém pivu, šťouchané brambory se zelím",
+              "price": "193 Kč"
+            },
+            {
+              "name": "Těstovinový salát se smaženým hermelínem, jogurtový dresink",
+              "price": "179 Kč"
+            },
+            {
+              "name": "Svíčková, hovězí maso, houskový knedlík, brusinky",
+              "price": "195 Kč"
             }
           ]
         }
       ],
       "ok": true,
-      "status": "Menu načteno (13 položek)",
+      "status": "Menu načteno (6 položek)",
       "error": ""
     }
   ]
