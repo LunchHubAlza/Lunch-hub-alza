@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lunch Hub scraper v2.
+"""Lunch Hub scraper v2.1.
 
 Parses each restaurant separately and only accepts prices with an explicit
 currency marker (Kc/CZK or ,-). If a page layout changes, the restaurant is
@@ -23,7 +23,7 @@ OUT = Path("data/menu.json")
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.0"
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.1"
     ),
     "Accept-Language": "cs-CZ,cs;q=0.9,en;q=0.7",
 }
@@ -75,6 +75,7 @@ SECTION_HEADINGS = {
     "menu s polévkou": "Menu s polévkou",
     "denní menu": "Denní menu",
     "denní nabídka": "Denní nabídka",
+    "týdenní nabídka": "Týdenní nabídka",
     "zvýhodněné menu jedna": "Zvýhodněné menu 1",
     "zvýhodněné menu dva": "Zvýhodněné menu 2",
     "hlavní chody": "Hlavní jídla",
@@ -92,21 +93,39 @@ def clean(value: str) -> str:
     return re.sub(r"\s+", " ", value).strip(" \t\r\n·|")
 
 
-def fetch(urls: Iterable[str]) -> tuple[BeautifulSoup, str]:
+def fetch(urls: Iterable[str], *, attempts_per_url: int = 2) -> tuple[BeautifulSoup, str]:
+    """Fetch a page, retrying transient network/empty-response failures."""
     errors: list[str] = []
     session = requests.Session()
     session.headers.update(HEADERS)
     for url in urls:
-        try:
-            response = session.get(url, timeout=(12, 30), allow_redirects=True)
-            response.raise_for_status()
-            if not response.text or len(response.text) < 300:
-                raise ValueError("Web vrátil prázdnou nebo neúplnou stránku")
-            response.encoding = response.apparent_encoding or response.encoding
-            return BeautifulSoup(response.text, "html.parser"), response.url
-        except Exception as exc:  # try the next URL, especially for Hamburg
-            errors.append(f"{url}: {type(exc).__name__}: {exc}")
-    raise RuntimeError("; ".join(errors)[-900:])
+        for attempt in range(1, attempts_per_url + 1):
+            try:
+                response = session.get(
+                    url,
+                    timeout=(15, 35),
+                    allow_redirects=True,
+                    headers={
+                        "Referer": url.rsplit("/", 1)[0] + "/",
+                        "Cache-Control": "no-cache",
+                        "Pragma": "no-cache",
+                    },
+                )
+                response.raise_for_status()
+                body = response.text or ""
+                # A short 200 response is often a transient placeholder or a
+                # blocked/incomplete page, particularly on Pod Párou.
+                if len(body.strip()) < 300:
+                    raise ValueError(f"Web vrátil prázdnou nebo neúplnou stránku ({len(body)} znaků)")
+                response.encoding = response.apparent_encoding or response.encoding
+                return BeautifulSoup(response.text, "html.parser"), response.url
+            except Exception as exc:
+                errors.append(f"{url} (pokus {attempt}/{attempts_per_url}): {type(exc).__name__}: {exc}")
+                if attempt < attempts_per_url:
+                    # Back off gently rather than hammering a restaurant site.
+                    import time
+                    time.sleep(1.5 * attempt)
+    raise RuntimeError("; ".join(errors)[-1200:])
 
 
 def text_lines(soup: BeautifulSoup) -> list[str]:
@@ -318,29 +337,39 @@ def find_last(lines: list[str], pattern: str, *, before: int | None = None) -> i
 def parse_domove(soup: BeautifulSoup) -> list[dict]:
     lines = text_lines(soup)
     start = find_last(lines, r"^Denní nabídka$")
-    end = next(
-        (i for i in range(start + 1, len(lines)) if re.search(r"^Stálá nabídka$", lines[i], re.I)),
-        len(lines),
-    )
-    block = lines[start + 1 : end]
 
-    # V Domově labels its first priced line as soup, followed by explicit
-    # "Menu s polévkou" and "Denní menu" headings.
+    # The page contains the current offer first and the permanent offer below
+    # it. Keep both blocks rather than stopping at the "Stálá nabídka" heading.
     result: list[dict] = []
     current_title = "Polévka"
     current_items: list[dict] = []
     pending: list[str] = []
-    for line in block:
+    headings = {
+        "menu s polévkou": "Menu s polévkou",
+        "denní menu": "Denní menu",
+        "stálá nabídka": "Stálá nabídka",
+    }
+
+    for line in lines[start + 1:]:
         low = line.casefold()
-        if low in {"menu s polévkou", "denní menu"}:
+        if low.startswith((
+            "kompletní nabídku najdete",
+            "alergeny na vyžádání",
+            "změna jídel vyhrazena",
+        )):
+            break
+
+        if low in headings:
             if current_items:
                 result.append({"title": current_title, "items": current_items})
-            current_title = "Menu s polévkou" if low == "menu s polévkou" else "Denní menu"
+            current_title = headings[low]
             current_items = []
             pending = []
             continue
+
         if is_date_or_heading_noise(line):
             continue
+
         price_data = parse_prices(line)
         if price_data:
             name_part, price = price_data
@@ -353,10 +382,11 @@ def parse_domove(soup: BeautifulSoup) -> list[dict]:
         else:
             if len(line) < 260:
                 pending.append(line)
+
     if current_items:
         result.append({"title": current_title, "items": current_items})
     if not result:
-        raise ValueError("Denní nabídku se nepodařilo rozparsovat (nebyla nalezena jídla s cenou)")
+        raise ValueError("Denní a stálou nabídku se nepodařilo rozparsovat (nebyla nalezena jídla s cenou)")
     return result
 
 
@@ -390,17 +420,38 @@ def parse_podparou(soup: BeautifulSoup) -> list[dict]:
 def parse_hamburg(soup: BeautifulSoup) -> list[dict]:
     lines = text_lines(soup)
     start = find_last(lines, r"Dnešní menu")
-    sections = parse_rows(
+
+    # The homepage has two consecutive blocks: today's menu and the weekly
+    # offer. Keep the weekly block under its own heading instead of stopping
+    # when the heading is encountered.
+    parsed = parse_rows(
         lines,
         start=start + 1,
-        stop_patterns=(r"^Týdenní nabídka$", r"^Kontakt$", r"^Otevírací doba$"),
+        stop_patterns=(r"^Kontakt$", r"^Otevírací doba$", r"^Otevřeno$"),
         default_section="Denní nabídka",
-        custom_headings=False,
+        custom_headings=True,
     )
-    items = [item for section in sections for item in section["items"]]
-    if not items:
-        raise ValueError("Na hlavní stránce Hamburg nebyly nalezeny řádky denního menu s cenou")
-    return split_general_sections(items)
+
+    daily_items: list[dict] = []
+    weekly_items: list[dict] = []
+    for section in parsed:
+        if section["title"].casefold() == "týdenní nabídka":
+            weekly_items.extend(section["items"])
+        else:
+            daily_items.extend(section["items"])
+
+    if not daily_items:
+        raise ValueError("Na hlavní stránce Hamburg nebyly nalezeny řádky dnešního menu s cenou")
+
+    result = split_general_sections(daily_items)
+    if weekly_items:
+        result.append({"title": "Týdenní nabídka", "items": weekly_items})
+    else:
+        # Keep the current daily menu visible, but surface an explicit warning
+        # in the Action log if the weekly heading exists without priced items.
+        if any(line.casefold() == "týdenní nabídka" for line in lines[start + 1:]):
+            print("WARNING | Hamburg: nadpis Týdenní nabídka nalezen, ale nepodařilo se vytáhnout položky s cenou")
+    return result
 
 
 def parse_holise(soup: BeautifulSoup) -> list[dict]:
@@ -446,8 +497,25 @@ def main() -> None:
             "error": "",
         }
         try:
-            soup, final_url = fetch(source["urls"])
-            sections = PARSERS[source["parser"]](soup)
+            parse_attempts = 3 if source["parser"] == "podparou" else 1
+            last_error: Exception | None = None
+            for attempt in range(1, parse_attempts + 1):
+                try:
+                    soup, final_url = fetch(
+                        source["urls"],
+                        attempts_per_url=1 if source["parser"] == "podparou" else 2,
+                    )
+                    sections = PARSERS[source["parser"]](soup)
+                    last_error = None
+                    break
+                except Exception as exc:
+                    last_error = exc
+                    if attempt < parse_attempts:
+                        import time
+                        print(f"RETRY | {source['name']}: pokus {attempt}/{parse_attempts} nevyšel: {exc}")
+                        time.sleep(2 * attempt)
+            if last_error is not None:
+                raise last_error
             item_count = sum(len(section["items"]) for section in sections)
             if item_count == 0:
                 raise ValueError("Parser nevrátil žádné položky")
