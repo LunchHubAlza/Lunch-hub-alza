@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lunch Hub scraper v2.1.
+"""Lunch Hub scraper v2.2.
 
 Parses each restaurant separately and only accepts prices with an explicit
 currency marker (Kc/CZK or ,-). If a page layout changes, the restaurant is
@@ -23,7 +23,7 @@ OUT = Path("data/menu.json")
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.1"
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.2"
     ),
     "Accept-Language": "cs-CZ,cs;q=0.9,en;q=0.7",
 }
@@ -79,6 +79,7 @@ SECTION_HEADINGS = {
     "zvýhodněné menu jedna": "Zvýhodněné menu 1",
     "zvýhodněné menu dva": "Zvýhodněné menu 2",
     "hlavní chody": "Hlavní jídla",
+    "hlavní jídla": "Hlavní jídla",
     "z našeho grilu": "Z našeho grilu",
     "stálá nabídka": "Stálá nabídka",
     "dezert": "Dezerty",
@@ -193,6 +194,7 @@ def is_date_or_heading_noise(line: str) -> bool:
     if low.startswith((
         "aktuální nabídka na dnešní den",
         "kompletní jídelní lístek najdete",
+        "v restauraci pod párou pro vás připravujeme",
         "denní nabídku podáváme",
         "pokud se vám nezobrazuje",
         "informace o alergenech",
@@ -439,6 +441,27 @@ def parse_hamburg(soup: BeautifulSoup) -> list[dict]:
             weekly_items.extend(section["items"])
         else:
             daily_items.extend(section["items"])
+
+    # The homepage continues with a drinks list below the weekly food offer.
+    # Keep the weekly section focused on meals; the drinks block is not part
+    # of the weekly lunch menu. One malformed visual separator can also be
+    # combined with the first beverage row, so filter both by content.
+    weekly_drink_re = re.compile(
+        r"\b(?:radler|limon[aá]d\w*|kofola|fresh\s+čaj|čaj|cider|"
+        r"nealko\w*|nealkohol\w*|pivo|káva|espresso|cola|voda|džus|juice|nápoj\w*)\b",
+        re.I,
+    )
+    cleaned_weekly: list[dict] = []
+    for item in weekly_items:
+        item_name = clean(item.get("name", ""))
+        # Discard separator fragments and beverage items accidentally included
+        # in the homepage's weekly-offer text block.
+        if re.search(r"[+]{3,}", item_name) or weekly_drink_re.search(item_name):
+            continue
+        if len(re.sub(r"[^A-Za-zÁ-ž]", "", item_name)) < 5:
+            continue
+        cleaned_weekly.append(item)
+    weekly_items = cleaned_weekly
 
     if not daily_items:
         raise ValueError("Na hlavní stránce Hamburg nebyly nalezeny řádky dnešního menu s cenou")
