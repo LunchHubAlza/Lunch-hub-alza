@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-26T14:40:15.924342+01:00",
-  "updated_label": "26.11.2026 14:40",
+  "updated_at": "2026-11-26T15:00:24.523897+01:00",
+  "updated_label": "26.11.2026 15:00",
   "date": "26.11.2026",
   "restaurants": [
     {
@@ -287,10 +287,77 @@
     {
       "name": "Mexická Holešovice",
       "url": "https://www.mexickaholesovice.cz/",
-      "sections": [],
-      "ok": false,
-      "status": "Načtení menu se nezdařilo",
-      "error": "ValueError: Na hlavní stránce Mexické nebyla nalezena sekce poledního menu"
+      "sections": [
+        {
+          "title": "Polévky",
+          "items": [
+            {
+              "name": "Crema de elote - krémová kukuřičná polévka - denní polévka",
+              "price": "49 Kč"
+            },
+            {
+              "name": "Sopa de Tortilla – týdenní polévka kuřecí vývar, tortilly, avokádo, sýr a kuřecí maso",
+              "price": "49 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Ceviche bar",
+          "items": [
+            {
+              "name": "Salpicon de Res – Salát s trhaným hovězím masem, koriandr, jalapenos, třešňová rajčata a mexické oregano",
+              "price": "158 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Taco station",
+          "items": [
+            {
+              "name": "4ks Tacos carnitas a chorrizo, salsa verde, nakládaná zelenina s jalapenos",
+              "price": "168 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Comida Corrida",
+          "items": [
+            {
+              "name": "Vepřová plec uzená v texaském smokeru, salsa ranchera, grilovaný ananas",
+              "price": "178 Kč"
+            },
+            {
+              "name": "Pollo alla vercruzana – kuře pečené v tomatové omáčce s olivami a zeleninou",
+              "price": "178 Kč"
+            },
+            {
+              "name": "Smažený květák, omáčka Romesco a grilovaná kukuřice",
+              "price": "178 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Specialita dne",
+          "items": [
+            {
+              "name": "Carne con patatas – hovězí dušené s bramborami, pečená rýže se špenátovými listy, salát s kukuřicí a cuketou s pico de gallo",
+              "price": "228 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Dezert týdne",
+          "items": [
+            {
+              "name": "Čokoládové brownies, hořká čokoláda a vanilková zmrzlina",
+              "price": "58 Kč"
+            }
+          ]
+        }
+      ],
+      "ok": true,
+      "status": "Menu načteno (9 položek)",
+      "error": ""
     },
     {
       "name": "Čtyrka",
