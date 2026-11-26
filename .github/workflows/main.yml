@@ -21,12 +21,12 @@ jobs:
         id: timecheck
         run: |
           HOUR=$(TZ=Europe/Prague date +%H)
-          if [ "$HOUR" = "10" ]; then
+          if [ "$HOUR" = "10" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
             echo "run=true" >> $GITHUB_OUTPUT
           else
             echo "run=false" >> $GITHUB_OUTPUT
           fi
-
+          
       - name: Set up Python
         if: steps.timecheck.outputs.run == 'true'
         uses: actions/setup-python@v5
