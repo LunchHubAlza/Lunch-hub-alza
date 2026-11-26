@@ -1,6 +1,86 @@
 {
-  "updated_at": null,
-  "updated_label": "Zatím nebyla provedena automatická aktualizace",
-  "date": null,
-  "restaurants": []
+  "updated_at": "2026-11-26T13:17:52.150148+01:00",
+  "updated_label": "26.11.2026 13:17",
+  "date": "26.11.2026",
+  "restaurants": [
+    {
+      "name": "V Domově",
+      "url": "https://restauracevdomove.cz/jidelni-listek-2/",
+      "sections": [],
+      "ok": false,
+      "status": "Načtení menu se nezdařilo",
+      "error": "Could not extract V Domově items"
+    },
+    {
+      "name": "Pod Párou",
+      "url": "https://podparou.eu/denni-menu/",
+      "sections": [
+        {
+          "title": "Denní nabídka",
+          "items": [
+            {
+              "name": "Dančí ragú na šípkách s houskovým a karlovarským knedlíkem 1,3,7,9,",
+              "price": "12 Kč",
+              "category": "Soup/first item"
+            },
+            {
+              "name": "Míchaný zeleninový salát s tuňákem, zelenými fazolkami, vejcem a bylinkovým dresinkem 1,3,4,7,",
+              "price": "10 Kč"
+            },
+            {
+              "name": "Specialita dne: Kuřecí prso - bramborová kaše, pancetta, lišky, cuketa, dýňové chipsy a rybízová omáčka 1,7,",
+              "price": "10 Kč"
+            },
+            {
+              "name": "180g",
+              "price": "289 Kč"
+            },
+            {
+              "name": "Dorty dle nabídky 1,3,6,7,8,10,",
+              "price": "12 Kč"
+            }
+          ]
+        }
+      ],
+      "ok": true,
+      "status": "Menu načteno",
+      "error": ""
+    },
+    {
+      "name": "Hamburg",
+      "url": "http://www.restauracehamburg.cz/",
+      "sections": [
+        {
+          "title": "Dnešní menu",
+          "items": [
+            {
+              "name": "1,3,7,",
+              "price": "12 Kč"
+            }
+          ]
+        }
+      ],
+      "ok": true,
+      "status": "Menu načteno",
+      "error": ""
+    },
+    {
+      "name": "U Holiše",
+      "url": "https://www.restauraceuholise.cz/denni-menu",
+      "sections": [
+        {
+          "title": "Denní menu",
+          "items": [
+            {
+              "name": "Denní menu - Čtvrtek 26.11.",
+              "price": "2026 Kč"
+            }
+          ]
+        }
+      ],
+      "ok": true,
+      "status": "Menu načteno",
+      "error": ""
+    }
+  ]
 }
