@@ -1,67 +1,109 @@
 {
-  "updated_at": "2026-11-26T13:17:52.150148+01:00",
-  "updated_label": "26.11.2026 13:17",
+  "updated_at": "2026-11-26T14:03:25.374434+01:00",
+  "updated_label": "26.11.2026 14:03",
   "date": "26.11.2026",
   "restaurants": [
     {
       "name": "V Domově",
       "url": "https://restauracevdomove.cz/jidelni-listek-2/",
-      "sections": [],
-      "ok": false,
-      "status": "Načtení menu se nezdařilo",
-      "error": "Could not extract V Domově items"
-    },
-    {
-      "name": "Pod Párou",
-      "url": "https://podparou.eu/denni-menu/",
       "sections": [
         {
-          "title": "Denní nabídka",
+          "title": "Polévka",
           "items": [
             {
-              "name": "Dančí ragú na šípkách s houskovým a karlovarským knedlíkem 1,3,7,9,",
-              "price": "12 Kč",
-              "category": "Soup/first item"
+              "name": "0,33 l Hovězí vývar s masem a nudlemi",
+              "price": "45 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Menu s polévkou",
+          "items": [
+            {
+              "name": "150 g Opečená sekaná, vařený brambor, okurka",
+              "price": "159 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Denní menu",
+          "items": [
+            {
+              "name": "150 g Svíčková na smetaně, karlovarský knedlík, brusinkový terč",
+              "price": "189 Kč"
             },
             {
-              "name": "Míchaný zeleninový salát s tuňákem, zelenými fazolkami, vejcem a bylinkovým dresinkem 1,3,4,7,",
-              "price": "10 Kč"
+              "name": "150 g Hovězí nudličky stroganov, hranolky",
+              "price": "185 Kč"
             },
             {
-              "name": "Specialita dne: Kuřecí prso - bramborová kaše, pancetta, lišky, cuketa, dýňové chipsy a rybízová omáčka 1,7,",
-              "price": "10 Kč"
+              "name": "200 g Špalek z panenky, omáčka ze zeleného pepře, steak hranolky",
+              "price": "199 Kč"
             },
             {
-              "name": "180g",
-              "price": "289 Kč"
+              "name": "150 g Segedínsky vepřový guláš, houskový knedlík",
+              "price": "175 Kč"
             },
             {
-              "name": "Dorty dle nabídky 1,3,6,7,8,10,",
-              "price": "12 Kč"
+              "name": "150 g Kuřecí stehno ala husa, červené zelí, mix.knedlík",
+              "price": "172 Kč"
+            },
+            {
+              "name": "270 g Kynuté jahodové knedlíky, zakysanka, šlehačka",
+              "price": "157 Kč"
             }
           ]
         }
       ],
       "ok": true,
-      "status": "Menu načteno",
+      "status": "Menu načteno (8 položek)",
       "error": ""
+    },
+    {
+      "name": "Pod Párou",
+      "url": "https://podparou.eu/denni-menu/",
+      "sections": [],
+      "ok": false,
+      "status": "Načtení menu se nezdařilo",
+      "error": "RuntimeError: https://podparou.eu/denni-menu/: ValueError: Web vrátil prázdnou nebo neúplnou stránku"
     },
     {
       "name": "Hamburg",
       "url": "http://www.restauracehamburg.cz/",
       "sections": [
         {
-          "title": "Dnešní menu",
+          "title": "Polévky",
           "items": [
             {
-              "name": "1,3,7,",
-              "price": "12 Kč"
+              "name": "Dršťková",
+              "price": "45 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Hlavní jídla",
+          "items": [
+            {
+              "name": "Pečené kuřecí prsíčko s hříbkovou omáčkou a máslovými bramborovými noky s pažitkou",
+              "price": "188 Kč"
+            },
+            {
+              "name": "Halušky s brynzou a restovaným špekem, zdobeno pažitkou",
+              "price": "186 Kč"
+            },
+            {
+              "name": "Opečená vinná klobása, bramborová kaše, malý rajčatový salátek",
+              "price": "188 Kč"
+            },
+            {
+              "name": "Hovězí Cheeseburger - ledový salát, cibulka ,rajče, kyselá okurka, majonézová hořčice, smažené hranolky, domácí tatarská omáčka",
+              "price": "219 Kč"
             }
           ]
         }
       ],
       "ok": true,
-      "status": "Menu načteno",
+      "status": "Menu načteno (5 položek)",
       "error": ""
     },
     {
@@ -69,17 +111,100 @@
       "url": "https://www.restauraceuholise.cz/denni-menu",
       "sections": [
         {
-          "title": "Denní menu",
+          "title": "Polévka",
           "items": [
             {
-              "name": "Denní menu - Čtvrtek 26.11.",
-              "price": "2026 Kč"
+              "name": "KUŘECÍ VÝVAR S MASEM A ZELENINOU, VAJEČNÝ SVÍTEK",
+              "price": "49 Kč"
+            },
+            {
+              "name": "ZELŇAČKA S UZENÝM MASEM (podáváme s pečivem)",
+              "price": "55 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Zvýhodněné menu 1",
+          "items": [
+            {
+              "name": "POLÉVKA DLE VÝBĚRU SMAŽENÝ HERMELÍN PLNĚNÝ ŠUNKOU, ŠŤOUCHANÝ BRAMBOR S MÁSLEM A CIBULKOU, TATARSKÁ OMÁČKA 0,2 l - TOČENÁ LIMONÁDA",
+              "price": "220 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Zvýhodněné menu 2",
+          "items": [
+            {
+              "name": "POLÉVKA DLE VÝBĚRU DANČÍ PEČENĚ SE ŠÍPKOVOU OMÁČKOU, BRUSINKY, VARIACE HOUSKOVÉHO A ŠPEKOVÉHO KNEDLÍKU 0,2 l - TOČENÁ LIMONÁDA",
+              "price": "235 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Hlavní jídla",
+          "items": [
+            {
+              "name": "SMAŽENÝ HERMELÍN PLNĚNÝ ŠUNKOU, ŠŤOUCHANÝ BRAMBOR S MÁSLEM A CIBULKOU, TATARSKÁ OMÁČKA",
+              "price": "190 Kč"
+            },
+            {
+              "name": "DANČÍ PEČENĚ SE ŠÍPKOVOU OMÁČKOU, BRUSINKY, VARIACE HOUSKOVÉHO A ŠPEKOVÉHO KNEDLÍKU",
+              "price": "205 Kč"
+            },
+            {
+              "name": "FILÍROVANÉ KUŘECÍ PRSO ŠPIKOVANÉ PAPRIKOU, PAPRIKÁŠOVÁ OMÁČKA, ZAKYSANÁ SMETANA, OPEČENÉ BRAMBOROVÉ NOKY/JASMÍNOVÁ RÝŽE",
+              "price": "195 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Z našeho grilu",
+          "items": [
+            {
+              "name": "PŮLKA KUŘETE, KRÉMOVÁ TARHOŇA SE ZELENINOU A ČERSTVÝM KRAVSKÝM SÝREM",
+              "price": "190 Kč"
+            },
+            {
+              "name": "CELÉ KUŘE, KRÉMOVÁ TARHOŇA SE ZELENINOU A ČERSTVÝM KRAVSKÝM SÝREM",
+              "price": "245 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Stálá nabídka",
+          "items": [
+            {
+              "name": "SMAŽENÝ SÝR, HRANOLKY, TATARSKÁ OMÁČKA, SALÁTEK COLESLAW",
+              "price": "205 Kč"
+            },
+            {
+              "name": "SMAŽENÝ KUŘECÍ ŘÍZEK, ŠŤOUCHANÝ BRAMBOR S MÁSLEM A CIBULKOU, CITRON",
+              "price": "205 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Dezerty",
+          "items": [
+            {
+              "name": "CHEESECAKE S MALINOVOU OMÁČKOU",
+              "price": "98 Kč"
+            }
+          ]
+        },
+        {
+          "title": "Nápoje",
+          "items": [
+            {
+              "name": "0,5l - PAULANER WEISSBIER NEALKOHOLICKÉ (německé pšeničné pivo)",
+              "price": "58 Kč"
             }
           ]
         }
       ],
       "ok": true,
-      "status": "Menu načteno",
+      "status": "Menu načteno (13 položek)",
       "error": ""
     }
   ]
