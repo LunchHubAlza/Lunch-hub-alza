@@ -1,0 +1,65 @@
+name: Update lunch menus
+
+on:
+  schedule:
+    - cron: '0 8 * * 1-5'
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: lunch-hub-update
+  cancel-in-progress: false
+
+jobs:
+  update-menu:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Check Prague time
+        id: timecheck
+        run: |
+          HOUR=$(TZ=Europe/Prague date +%H)
+          if [ "$HOUR" = "10" ] || [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> $GITHUB_OUTPUT
+          else
+            echo "run=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Set up Python
+        if: steps.timecheck.outputs.run == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Python dependencies
+        if: steps.timecheck.outputs.run == 'true'
+        run: pip install -r requirements.txt
+
+      - name: Install Chromium for JavaScript-rendered menu
+        if: steps.timecheck.outputs.run == 'true'
+        run: python -m playwright install --with-deps chromium
+
+      - name: Run menu scraper
+        if: steps.timecheck.outputs.run == 'true'
+        run: python scraper.py
+
+      - name: Commit updated menu
+        if: steps.timecheck.outputs.run == 'true'
+        run: |
+          git config user.name "Lunch Hub Bot"
+          git config user.email "actions@github.com"
+          git add data/menu.json
+          if git diff --cached --quiet; then
+            echo "No menu changes to commit"
+            exit 0
+          fi
+          git commit -m "Update daily menus"
+          git pull --rebase origin main
+          git push origin HEAD:main

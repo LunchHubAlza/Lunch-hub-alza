@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lunch Hub scraper v2.3.
+"""Lunch Hub scraper v2.4.
 
 Parses each restaurant separately and only accepts prices with an explicit
 currency marker (Kc/CZK or ,-). If a page layout changes, the restaurant is
@@ -23,7 +23,7 @@ OUT = Path("data/menu.json")
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.3"
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.4"
     ),
     "Accept-Language": "cs-CZ,cs;q=0.9,en;q=0.7",
 }
@@ -142,6 +142,69 @@ def fetch(urls: Iterable[str], *, attempts_per_url: int = 2) -> tuple[BeautifulS
                     import time
                     time.sleep(1.5 * attempt)
     raise RuntimeError("; ".join(errors)[-1200:])
+
+
+def fetch_rendered_page(urls: Iterable[str]) -> tuple[BeautifulSoup, str]:
+    """Render a JavaScript-dependent page in Chromium (used as Mexická fallback).
+
+    Some versions of the restaurant homepage return only a browser/JavaScript
+    notice to plain HTTP clients. Playwright executes the page scripts and then
+    hands the rendered HTML to the same parser used by the other restaurants.
+    """
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError as exc:
+        raise RuntimeError(
+            "Chybí Playwright. V requirements.txt musí být playwright a workflow "
+            "musí instalovat Chromium příkazem 'python -m playwright install --with-deps chromium'."
+        ) from exc
+
+    errors: list[str] = []
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+        try:
+            for url in urls:
+                context = browser.new_context(
+                    locale="cs-CZ",
+                    timezone_id="Europe/Prague",
+                    user_agent=(
+                        "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 "
+                        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36"
+                    ),
+                )
+                page = context.new_page()
+                try:
+                    response = page.goto(url, wait_until="domcontentloaded", timeout=60000)
+                    # Wait for the lunch section to be inserted/rendered by JS.
+                    try:
+                        page.wait_for_function(
+                            "() => document.body && /Polévky/i.test(document.body.innerText)",
+                            timeout=20000,
+                        )
+                    except Exception:
+                        # Capture a short diagnostic instead of silently guessing.
+                        body_text = page.locator("body").inner_text(timeout=10000)
+                        errors.append(
+                            f"{url}: HTTP {response.status if response else 'n/a'}, "
+                            f"text={clean(body_text)[:350]!r}"
+                        )
+                        continue
+
+                    html = page.content()
+                    soup = BeautifulSoup(html, "html.parser")
+                    body_text = clean(page.locator("body").inner_text(timeout=10000))
+                    if re.search(r"\bPolévky\b", body_text, re.I):
+                        print(f"INFO | Mexická: po neúspěšném HTTP načtení použito vykreslení Chromium ({url})")
+                        return soup, page.url
+                    errors.append(f"{url}: menu text se po vykreslení nenašel; text={body_text[:350]!r}")
+                except Exception as exc:
+                    errors.append(f"{url}: {type(exc).__name__}: {exc}")
+                finally:
+                    context.close()
+        finally:
+            browser.close()
+
+    raise RuntimeError("Playwright nedokázal načíst menu Mexické: " + "; ".join(errors)[-1200:])
 
 
 def text_lines(soup: BeautifulSoup) -> list[str]:
@@ -573,13 +636,37 @@ def parse_ctyrka(soup: BeautifulSoup) -> list[dict]:
 def parse_mexicka(soup: BeautifulSoup) -> list[dict]:
     """Parse the lunch service on Mexická's homepage, deliberately excluding drinks."""
     lines = text_lines(soup)
-    start_candidates = [i for i, line in enumerate(lines) if re.fullmatch(r"Polévky", line, re.I)]
+    # The homepage sometimes combines the weekday/opening hours and the
+    # heading into one text node (e.g. "ČTVRTEK 11:00–14:30 Polévky").
+    # Search for the marker inside a line instead of requiring an exact match.
+    start_candidates = [i for i, line in enumerate(lines) if re.search(r"\bPolévky\b", line, re.I)]
     start = next(
-        (i for i in start_candidates if any(re.search(r"\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}", x) for x in lines[max(0, i - 3):i])),
+        (i for i in start_candidates if any(
+            re.search(r"\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}", x)
+            or re.search(r"\b(?:pondělí|úterý|středa|čtvrtek|pátek|sobota|neděle)\b", x, re.I)
+            for x in lines[max(0, i - 5):i]
+        )),
         start_candidates[0] if start_candidates else None,
     )
     if start is None:
-        raise ValueError("Na hlavní stránce Mexické nebyla nalezena sekce poledního menu")
+        preview = " | ".join(lines[:24])[:700]
+        if re.search(r"javascript|musíte změnit nastavení|prohlížeče", preview, re.I):
+            raise ValueError(
+                "Web Mexické vrátil stránku s upozorněním na JavaScript místo obsahu menu. "
+                "Je potřeba použít vykreslení stránky v Chromium. Náhled: " + preview
+            )
+        raise ValueError(
+            "V HTML Mexické nebyl nalezen nadpis Polévky. Náhled staženého textu: " + preview
+        )
+
+    # Normalize the first line if the heading was embedded after weekday/time.
+    first_line = lines[start]
+    marker = re.search(r"\bPolévky\b", first_line, re.I)
+    menu_lines = ["Polévky"]
+    remainder = first_line[marker.end():].strip(" :-–—") if marker else ""
+    if remainder:
+        menu_lines.append(remainder)
+    menu_lines.extend(lines[start + 1:])
 
     headings = {
         "polévky": "Polévky",
@@ -612,7 +699,7 @@ def parse_mexicka(soup: BeautifulSoup) -> list[dict]:
             sections.append({"title": current_title, "items": current_items})
         current_items = []
 
-    for raw in lines[start:]:
+    for raw in menu_lines:
         line = clean(raw)
         low = line.casefold()
         if low.startswith((
@@ -788,11 +875,23 @@ def main() -> None:
             last_error: Exception | None = None
             for attempt in range(1, parse_attempts + 1):
                 try:
-                    soup, final_url = fetch(
-                        source["urls"],
-                        attempts_per_url=1 if source["parser"] == "podparou" else 2,
-                    )
-                    sections = filter_food_only(PARSERS[source["parser"]](soup))
+                    if source["parser"] == "mexicka":
+                        try:
+                            soup, final_url = fetch(source["urls"], attempts_per_url=2)
+                            sections = filter_food_only(PARSERS["mexicka"](soup))
+                        except Exception as http_error:
+                            print(
+                                "INFO | Mexická: běžné HTTP načtení nevrátilo polední menu; "
+                                f"zkouším JavaScriptové vykreslení: {http_error}"
+                            )
+                            soup, final_url = fetch_rendered_page(source["urls"])
+                            sections = filter_food_only(PARSERS["mexicka"](soup))
+                    else:
+                        soup, final_url = fetch(
+                            source["urls"],
+                            attempts_per_url=1 if source["parser"] == "podparou" else 2,
+                        )
+                        sections = filter_food_only(PARSERS[source["parser"]](soup))
                     last_error = None
                     break
                 except Exception as exc:
