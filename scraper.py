@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Lunch Hub scraper v2.2.
+"""Lunch Hub scraper v2.3.
 
 Parses each restaurant separately and only accepts prices with an explicit
 currency marker (Kc/CZK or ,-). If a page layout changes, the restaurant is
@@ -23,7 +23,7 @@ OUT = Path("data/menu.json")
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
-        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.2"
+        "(KHTML, like Gecko) Chrome/130.0.0.0 Safari/537.36 LunchHub/2.3"
     ),
     "Accept-Language": "cs-CZ,cs;q=0.9,en;q=0.7",
 }
@@ -58,11 +58,26 @@ SOURCES = [
         "urls": ["https://www.restauraceuholise.cz/denni-menu"],
         "parser": "holise",
     },
+    {
+        "name": "Mexická Holešovice",
+        "url": "https://www.mexickaholesovice.cz/",
+        "urls": [
+            "https://www.mexickaholesovice.cz/",
+            "https://mexickaholesovice.cz/",
+        ],
+        "parser": "mexicka",
+    },
+    {
+        "name": "Čtyrka",
+        "url": "https://www.ctyr-ka.cz/",
+        "urls": ["https://www.ctyr-ka.cz/", "https://ctyr-ka.cz/"],
+        "parser": "ctyrka",
+    },
 ]
 
 # Crucial: the currency marker is mandatory. Allergen numbers (1,3,7,12),
 # portions (180g) and years (2026) are never interpreted as prices.
-PRICE_RE = re.compile(r"(?<!\d)(?P<amount>\d{1,4})\s*(?P<currency>,-\s*(?:Kč)?|Kč|CZK)", re.I)
+PRICE_RE = re.compile(r"(?<!\d)(?P<amount>\d{1,4})\s*(?P<currency>(?:,|\.)(?:-|–|—)\s*(?:Kč)?|Kč|CZK)", re.I)
 ALLERGEN_CODE = r"(?:1[0-4]|[1-9])[a-z]?"
 ALLERGEN_LIST_RE = re.compile(rf"(?:{ALLERGEN_CODE}(?:\s*,\s*{ALLERGEN_CODE})+)", re.I)
 DATE_RE = re.compile(
@@ -168,20 +183,23 @@ def parse_prices(line: str) -> tuple[str, str] | None:
 
 def strip_allergens(name: str) -> str:
     name = clean(name)
-    # Allergen lists can appear before or after the dish name, e.g. Hamburg:
-    # "1,3,7 Dršťková" or Pod Párou: "Gulášová 1 45,-".
+    # Leading allergen codes (e.g. Hamburg's "1,3,7 Dršťková").
     name = re.sub(rf"^\s*{ALLERGEN_CODE}(?:\s*,\s*{ALLERGEN_CODE})+\s*", "", name, flags=re.I)
-    name = re.sub(rf"\s*\(\s*{ALLERGEN_CODE}(?:\s*,\s*{ALLERGEN_CODE})+\s*\)\s*", " ", name, flags=re.I)
-    # Remove comma-separated allergens immediately before an optional portion
-    # (e.g. "... 1,7,10 180g").
+    # Allergen codes in parentheses anywhere in the name.
     name = re.sub(
-        rf"\s+{ALLERGEN_CODE}(?:\s*,\s*{ALLERGEN_CODE})+(?:\s*)(?=(?:\d+(?:[.,]\d+)?\s*(?:g|ml|l)\b)?$)",
+        rf"\s*\(\s*{ALLERGEN_CODE}(?:\s*,\s*{ALLERGEN_CODE})*\s*\)",
         " ",
         name,
         flags=re.I,
     )
-    # A single trailing allergen number is common on Pod Párou ("Gulášová 1").
-    name = re.sub(rf"\s+{ALLERGEN_CODE}\s*$", "", name, flags=re.I)
+    # Trailing allergen lists, including website styles such as "/ 1, 3, 7"
+    # or a single code "/ 7". This is intentionally anchored at the end.
+    name = re.sub(
+        rf"\s*(?:/\s*)?{ALLERGEN_CODE}(?:\s*,\s*{ALLERGEN_CODE})*\s*$",
+        "",
+        name,
+        flags=re.I,
+    )
     return clean(name)
 
 
@@ -492,12 +510,258 @@ def parse_holise(soup: BeautifulSoup) -> list[dict]:
     return sections
 
 
+def parse_ctyrka(soup: BeautifulSoup) -> list[dict]:
+    """Parse the lunch-menu block on Čtyrka's homepage; stop before tap drinks."""
+    lines = text_lines(soup)
+    starts = [i for i, line in enumerate(lines) if re.fullmatch(r"Polední\s+menu\s*:?", line, re.I)]
+    if not starts:
+        raise ValueError("Na hlavní stránce Čtyrky nebyla nalezena sekce Polední menu")
+    start = starts[-1]
+    stop = next(
+        (i for i in range(start + 1, len(lines)) if re.match(r"^Na čepu\s*:?", lines[i], re.I)),
+        len(lines),
+    )
+    block = lines[start + 1:stop]
+    soup_items: list[dict] = []
+    food_lines: list[str] = []
+
+    for index, line in enumerate(block):
+        if re.match(r"^Polévka\s*:", line, re.I):
+            price_data = parse_prices(line)
+            if price_data:
+                name, price = price_data
+                name = re.sub(r"^Polévka\s*:\s*", "", name, flags=re.I)
+                name = strip_allergens(name)
+                if name:
+                    soup_items.append({"name": name, "price": price})
+            else:
+                # Some variants print the soup name and its price on separate lines.
+                soup_name = re.sub(r"^Polévka\s*:\s*", "", line, flags=re.I)
+                soup_items.append({"name": strip_allergens(soup_name), "price": ""})
+            continue
+        food_lines.append(line)
+
+    sections: list[dict] = []
+    if soup_items and soup_items[0].get("price"):
+        sections.append({"title": "Polévka", "items": soup_items})
+    elif soup_items:
+        # Pair a split soup price if the site changes its line layout.
+        for line in food_lines[:2]:
+            parsed = parse_prices(line)
+            if parsed and parsed[1]:
+                soup_items[0]["price"] = parsed[1]
+                food_lines.remove(line)
+                break
+        if soup_items[0].get("price"):
+            sections.append({"title": "Polévka", "items": soup_items})
+
+    main_sections = parse_rows(
+        food_lines,
+        start=0,
+        stop_patterns=(r"^Na čepu", r"^Kontakt$", r"^Otevírací doba$"),
+        default_section="Hlavní jídla",
+        custom_headings=False,
+    )
+    mains = [item for section in main_sections for item in section["items"]]
+    if mains:
+        sections.append({"title": "Hlavní jídla", "items": mains})
+    if not sections:
+        raise ValueError("Z poledního menu Čtyrky se nepodařilo získat žádné jídlo s cenou")
+    return sections
+
+
+def parse_mexicka(soup: BeautifulSoup) -> list[dict]:
+    """Parse the lunch service on Mexická's homepage, deliberately excluding drinks."""
+    lines = text_lines(soup)
+    start_candidates = [i for i, line in enumerate(lines) if re.fullmatch(r"Polévky", line, re.I)]
+    start = next(
+        (i for i in start_candidates if any(re.search(r"\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}", x) for x in lines[max(0, i - 3):i])),
+        start_candidates[0] if start_candidates else None,
+    )
+    if start is None:
+        raise ValueError("Na hlavní stránce Mexické nebyla nalezena sekce poledního menu")
+
+    headings = {
+        "polévky": "Polévky",
+        "ceviche bar": "Ceviche bar",
+        "taco station": "Taco station",
+        "comida corrida": "Comida Corrida",
+        "dezert týdne": "Dezert týdne",
+    }
+    sections: list[dict] = []
+    current_title = "Polévky"
+    current_items: list[dict] = []
+    pending: list[str] = []
+    comida_price = ""
+    collect_comida_choices = False
+    skip_sides = False
+    special_price = ""
+    special_parts: list[str] = []
+
+    def flush_special() -> None:
+        nonlocal special_price, special_parts
+        name = normalize_item_name(special_parts)
+        if name and special_price:
+            sections.append({"title": "Specialita dne", "items": [{"name": name, "price": special_price}]})
+        special_price = ""
+        special_parts = []
+
+    def flush_current() -> None:
+        nonlocal current_items
+        if current_items:
+            sections.append({"title": current_title, "items": current_items})
+        current_items = []
+
+    for raw in lines[start:]:
+        line = clean(raw)
+        low = line.casefold()
+        if low.startswith((
+            "po dobu obědů",
+            "informace o alergenech",
+            "mexická",
+            "nejsme v tom sami",
+            "otevírací doba",
+            "rezervace",
+        )):
+            flush_special()
+            break
+
+        if low in headings:
+            flush_special()
+            flush_current()
+            current_title = headings[low]
+            pending = []
+            collect_comida_choices = False
+            skip_sides = False
+            continue
+
+        if low.startswith("specialita dne"):
+            flush_current()
+            pending = []
+            parsed_special = parse_prices(line)
+            special_price = parsed_special[1] if parsed_special else ""
+            special_parts = []
+            continue
+
+        if special_price:
+            # The special's name/description is printed immediately after its price label.
+            if low in headings:
+                flush_special()
+                flush_current()
+                current_title = headings[low]
+                continue
+            if parse_prices(line):
+                parsed = parse_prices(line)
+                if parsed and parsed[0]:
+                    special_parts.append(parsed[0])
+                    special_price = parsed[1]
+                    flush_special()
+                continue
+            if is_date_or_heading_noise(line) or low.startswith(("denní přílohy", "podávané s hlavním")):
+                continue
+            special_parts.append(line)
+            # The description is typically one line; flush when the next known section arrives.
+            continue
+
+        if current_title.casefold() == "comida corrida":
+            if low.startswith("denní přílohy"):
+                skip_sides = True
+                continue
+            if low.startswith("podávané s hlavním jídlem"):
+                skip_sides = False
+                collect_comida_choices = True
+                continue
+            if collect_comida_choices:
+                option = re.sub(r"^\s*\d+[.)]\s*", "", line)
+                if option and not is_date_or_heading_noise(option):
+                    price_data = parse_prices(option)
+                    if price_data:
+                        option = price_data[0]
+                    option = normalize_item_name([option])
+                    if option:
+                        current_items.append({"name": option, "price": comida_price or "178 Kč"})
+                continue
+            if skip_sides:
+                continue
+            price_data = parse_prices(line)
+            if price_data and not price_data[0]:
+                comida_price = price_data[1]
+            elif price_data and price_data[0]:
+                # Some days the fixed-price offer is printed as one line.
+                current_items.append({"name": normalize_item_name([price_data[0]]), "price": price_data[1]})
+            continue
+
+        if is_date_or_heading_noise(line):
+            continue
+        price_data = parse_prices(line)
+        if price_data:
+            name_part, price = price_data
+            if name_part:
+                pending.append(name_part)
+            name = normalize_item_name(pending)
+            pending = []
+            if len(name) >= 3:
+                current_items.append({"name": name, "price": price})
+        else:
+            # Ignore service-time and descriptive boilerplate; keep food-name fragments.
+            if re.fullmatch(r"\d{1,2}:\d{2}\s*[–-]\s*\d{1,2}:\d{2}", line):
+                continue
+            if low.startswith(("denní přílohy", "podávané s hlavním jídlem")):
+                continue
+            if len(line) < 260:
+                pending.append(line)
+
+    flush_special()
+    flush_current()
+    sections = [section for section in sections if section["items"]]
+    if not sections:
+        raise ValueError("Z poledního menu Mexické se nepodařilo získat žádná jídla s cenou")
+    return sections
+
+
 PARSERS = {
     "domove": parse_domove,
     "podparou": parse_podparou,
     "hamburg": parse_hamburg,
     "holise": parse_holise,
+    "mexicka": parse_mexicka,
+    "ctyrka": parse_ctyrka,
 }
+
+
+BEVERAGE_SECTION_RE = re.compile(r"^(?:nápoje?|drinks?|nápojový lístek|na čepu)$", re.I)
+BEVERAGE_ITEM_RE = re.compile(
+    r"^(?:"
+    r"(?:\d+(?:[.,]\d+)?\s*(?:l|ml)\s*[-–]?\s*)?"
+    r"(?:paulaner|birell|radler|kofola|cider|plzeň|prazdroj|"
+    r"čepovan[ée]\s+(?:pivo|kofola|limonáda)|"
+    r"domácí\s+limonád\w*|limonád\w*|fresh\s+(?:čaj|juice)|"
+    r"čaj\b|filtrovaná\s+voda|kokosová\s+voda|agua\s+de\s+|tamarindo\b|"
+    r"coca\s*cola|jarritos|römerquelle|fever\s+tree|espresso|káva\b|"
+    r"nealkoholick[ée]\s+cider|nápoj\w*)"
+    r")",
+    re.I,
+)
+
+
+def filter_food_only(sections: list[dict]) -> list[dict]:
+    """Drop drinks sections/rows while keeping dishes such as beer-braised pork."""
+    filtered: list[dict] = []
+    for section in sections:
+        title = clean(section.get("title", ""))
+        if BEVERAGE_SECTION_RE.fullmatch(title):
+            continue
+        items = []
+        for item in section.get("items", []):
+            name = clean(item.get("name", ""))
+            if not name or BEVERAGE_ITEM_RE.match(name):
+                continue
+            if not item.get("price"):
+                continue
+            items.append({"name": name, "price": clean(item["price"])})
+        if items:
+            filtered.append({"title": title, "items": items})
+    return filtered
 
 
 def main() -> None:
@@ -528,7 +792,7 @@ def main() -> None:
                         source["urls"],
                         attempts_per_url=1 if source["parser"] == "podparou" else 2,
                     )
-                    sections = PARSERS[source["parser"]](soup)
+                    sections = filter_food_only(PARSERS[source["parser"]](soup))
                     last_error = None
                     break
                 except Exception as exc:
