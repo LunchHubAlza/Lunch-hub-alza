@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-26T14:14:11.563242+01:00",
-  "updated_label": "26.11.2026 14:14",
+  "updated_at": "2026-11-26T14:18:54.135627+01:00",
+  "updated_label": "26.11.2026 14:18",
   "date": "26.11.2026",
   "restaurants": [
     {
@@ -96,7 +96,7 @@
           "title": "Polévky",
           "items": [
             {
-              "name": "V Restauraci Pod Párou pro vás připravujeme každý den zvýhodněné polední menu. Gulášová",
+              "name": "Gulášová",
               "price": "45 Kč"
             }
           ]
@@ -184,40 +184,12 @@
             {
               "name": "Segedínský guláš s houskovými knedlíky",
               "price": "195 Kč"
-            },
-            {
-              "name": "+++++++++++ ,- Kč +++++++++++ ,- Kč Radler nealko grep 0,3",
-              "price": "45 Kč"
-            },
-            {
-              "name": "Domácí limonády -malinová, bezinková, levandulová, zázvorová, citronová s tymiánem, marakuja-mango",
-              "price": "45 Kč"
-            },
-            {
-              "name": "Domácí limonáda z rakytníku",
-              "price": "50 Kč"
-            },
-            {
-              "name": "Čepovaná kofola 0,3l",
-              "price": "30 Kč"
-            },
-            {
-              "name": "Fresh čaj (máta, zázvor)",
-              "price": "69 Kč"
-            },
-            {
-              "name": "Cider nealkoholický - jablko",
-              "price": "85 Kč"
-            },
-            {
-              "name": "Cider alkoholický - jablko, višeň",
-              "price": "85 Kč"
             }
           ]
         }
       ],
       "ok": true,
-      "status": "Menu načteno (13 položek)",
+      "status": "Menu načteno (6 položek)",
       "error": ""
     },
     {
