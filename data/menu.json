@@ -1,7 +1,7 @@
 {
-  "updated_at": "2026-11-26T15:00:24.523897+01:00",
-  "updated_label": "26.11.2026 15:00",
-  "date": "26.11.2026",
+  "updated_at": "2026-11-27T10:54:17.673245+01:00",
+  "updated_label": "27.11.2026 10:54",
+  "date": "27.11.2026",
   "restaurants": [
     {
       "name": "V Domově",
@@ -20,8 +20,8 @@
           "title": "Menu s polévkou",
           "items": [
             {
-              "name": "150 g Opečená sekaná, vařený brambor, okurka",
-              "price": "159 Kč"
+              "name": "150 g Sekaná svíčková, mix.knedlík",
+              "price": "169 Kč"
             }
           ]
         },
@@ -29,24 +29,24 @@
           "title": "Denní menu",
           "items": [
             {
-              "name": "150 g Svíčková na smetaně, karlovarský knedlík, brusinkový terč",
-              "price": "189 Kč"
-            },
-            {
               "name": "150 g Hovězí nudličky stroganov, hranolky",
               "price": "185 Kč"
             },
             {
-              "name": "200 g Špalek z panenky, omáčka ze zeleného pepře, steak hranolky",
+              "name": "200 g Kuřecí steak zapečený s nivou, krokety",
               "price": "199 Kč"
             },
             {
-              "name": "150 g Segedínsky vepřový guláš, houskový knedlík",
+              "name": "150 g Segedínský guláš speciál, houskový knedlík",
               "price": "175 Kč"
             },
             {
-              "name": "150 g Kuřecí stehno ala husa, červené zelí, mix.knedlík",
+              "name": "150 g Pečené kuřecí stehno, vařený brambor, okurka",
               "price": "172 Kč"
+            },
+            {
+              "name": "150 g Smažené olomoucké tvarůžky, brambor, tatarka",
+              "price": "175 Kč"
             },
             {
               "name": "270 g Kynuté jahodové knedlíky, zakysanka, šlehačka",
@@ -93,40 +93,35 @@
       "url": "https://podparou.eu/denni-menu/",
       "sections": [
         {
-          "title": "Polévky",
-          "items": [
-            {
-              "name": "Gulášová",
-              "price": "45 Kč"
-            }
-          ]
-        },
-        {
           "title": "Hlavní jídla",
           "items": [
             {
-              "name": "Kuřecí medailonky s grilovanou zeleninou, estragonovou omáčkou a rozmarýnovým bramborem",
+              "name": "Špenátová s vejcem a krutóny",
+              "price": "45 Kč"
+            },
+            {
+              "name": "Masový mix grill z vepřové panenky, krkovice a kuřecích prsou s bylinkovým máslem, šťouchaným bramborem a salátkem",
               "price": "195 Kč"
             },
             {
-              "name": "Dančí ragú na šípkách s houskovým a karlovarským knedlíkem",
+              "name": "Hovězí pečeně na zázvoru s dušenou karotkou a bylinkovými špeclemi",
               "price": "195 Kč"
             },
             {
-              "name": "Vepřové na divoko s dušeným červeným zelím a bramborovými špalíky",
+              "name": "Řecká musaka zapečené brambory s ragú z mletého masa, tomat, lilku, oregana, ovčím sýrem a zakysanou smetanou",
               "price": "189 Kč"
             },
             {
-              "name": "Linguine all´amatriciana s pancettou a parmezánem",
-              "price": "189 Kč / 169 Kč (vegetariánská varianta)"
+              "name": "Lívance s borůvkovou omáčkou a lehkým krémem",
+              "price": "179 Kč / 89 Kč"
             },
             {
-              "name": "Míchaný zeleninový salát s tuňákem, zelenými fazolkami, vejcem a bylinkovým dresinkem",
-              "price": "195 Kč / 165 Kč (vegetariánská varianta)"
+              "name": "Míchaný zeleninový salát s kousky camembertu v trojobalu, vlašskými ořechy a brusinkový dresinkem",
+              "price": "189 Kč"
             },
             {
-              "name": "Specialita dne: Kuřecí prso - bramborová kaše, pancetta, lišky, cuketa, dýňové chipsy a rybízová omáčka 1,7,10 180g",
-              "price": "289 Kč"
+              "name": "Specialita dne: Konfitované kachní stehno - opečené bramborové špalíky s perníkem, karamelizované červené zelí s hruškami a omáčka z vlastního výpeku",
+              "price": "279 Kč"
             }
           ]
         },
@@ -149,32 +144,27 @@
       "url": "http://www.restauracehamburg.cz/",
       "sections": [
         {
-          "title": "Polévky",
-          "items": [
-            {
-              "name": "Dršťková",
-              "price": "45 Kč"
-            }
-          ]
-        },
-        {
           "title": "Hlavní jídla",
           "items": [
             {
-              "name": "Pečené kuřecí prsíčko s hříbkovou omáčkou a máslovými bramborovými noky s pažitkou",
+              "name": "Tomatová s tarhoňou a čerstvou bazalkou",
+              "price": "45 Kč"
+            },
+            {
+              "name": "Kuřecí prsíčko plněné slaninou a hermelínem se šťouchanými bramborami s jarní cibulkou, trhané saláty",
               "price": "188 Kč"
             },
             {
-              "name": "Halušky s brynzou a restovaným špekem, zdobeno pažitkou",
-              "price": "186 Kč"
-            },
-            {
-              "name": "Opečená vinná klobása, bramborová kaše, malý rajčatový salátek",
+              "name": "Noky Quattro Formaggi s kuřecím masem - čtyři druhy sýra, smetana",
               "price": "188 Kč"
             },
             {
-              "name": "Hovězí Cheeseburger - ledový salát, cibulka ,rajče, kyselá okurka, majonézová hořčice, smažené hranolky, domácí tatarská omáčka",
-              "price": "219 Kč"
+              "name": "Pečené karbanátky s bramborovou kaší a kyselou okurkou",
+              "price": "188 Kč"
+            },
+            {
+              "name": "Filírované kachní prsíčko se šalotkovou omáčkou a bramboro-patátovým pyré",
+              "price": "209 Kč"
             }
           ]
         },
@@ -204,8 +194,12 @@
               "price": "49 Kč"
             },
             {
-              "name": "ZELŇAČKA S UZENÝM MASEM (podáváme s pečivem)",
-              "price": "55 Kč"
+              "name": "KRÉMOVÁ ČESNEČKA S UZENÝM MASEM, KRUTONY",
+              "price": "49 Kč"
+            },
+            {
+              "name": "ZELŇAČKA S UZENÝM MASEM",
+              "price": "49 Kč"
             }
           ]
         },
@@ -213,8 +207,8 @@
           "title": "Zvýhodněné menu 1",
           "items": [
             {
-              "name": "POLÉVKA DLE VÝBĚRU SMAŽENÝ HERMELÍN PLNĚNÝ ŠUNKOU, ŠŤOUCHANÝ BRAMBOR S MÁSLEM A CIBULKOU, TATARSKÁ OMÁČKA 0,2 l - TOČENÁ LIMONÁDA",
-              "price": "220 Kč"
+              "name": "POLÉVKA DLE VÝBĚRU SMAŽENÝ KUŘECÍ ŘÍZEK, BRAMBOROVÝ SALÁT, CITRON 0,2 l - TOČENÁ LIMONÁDA",
+              "price": "225 Kč"
             }
           ]
         },
@@ -222,7 +216,7 @@
           "title": "Zvýhodněné menu 2",
           "items": [
             {
-              "name": "POLÉVKA DLE VÝBĚRU DANČÍ PEČENĚ SE ŠÍPKOVOU OMÁČKOU, BRUSINKY, VARIACE HOUSKOVÉHO A ŠPEKOVÉHO KNEDLÍKU 0,2 l - TOČENÁ LIMONÁDA",
+              "name": "POLÉVKA DLE VÝBĚRU MIX GRIL (krůtí prso, kuřecí prso, vepřová panenka), HRANOLKY, ČESNEKOVÝ DIP, MÍCHANÝ ZELENINOVÝ SALÁTEK 0,2 l - TOČENÁ LIMONÁDA",
               "price": "235 Kč"
             }
           ]
@@ -231,29 +225,20 @@
           "title": "Hlavní jídla",
           "items": [
             {
-              "name": "SMAŽENÝ HERMELÍN PLNĚNÝ ŠUNKOU, ŠŤOUCHANÝ BRAMBOR S MÁSLEM A CIBULKOU, TATARSKÁ OMÁČKA",
-              "price": "190 Kč"
+              "name": "SMAŽENÝ KUŘECÍ ŘÍZEK, BRAMBOROVÝ SALÁT, CITRON",
+              "price": "195 Kč"
             },
             {
-              "name": "DANČÍ PEČENĚ SE ŠÍPKOVOU OMÁČKOU, BRUSINKY, VARIACE HOUSKOVÉHO A ŠPEKOVÉHO KNEDLÍKU",
+              "name": "MIX GRIL (krůtí prso, kuřecí prso, vepřová panenka), HRANOLKY, ČESNEKOVÝ DIP, MÍCHANÝ ZELENINOVÝ SALÁTEK",
               "price": "205 Kč"
             },
             {
-              "name": "FILÍROVANÉ KUŘECÍ PRSO ŠPIKOVANÉ PAPRIKOU, PAPRIKÁŠOVÁ OMÁČKA, ZAKYSANÁ SMETANA, OPEČENÉ BRAMBOROVÉ NOKY/JASMÍNOVÁ RÝŽE",
-              "price": "195 Kč"
-            }
-          ]
-        },
-        {
-          "title": "Z našeho grilu",
-          "items": [
-            {
-              "name": "PŮLKA KUŘETE, KRÉMOVÁ TARHOŇA SE ZELENINOU A ČERSTVÝM KRAVSKÝM SÝREM",
-              "price": "190 Kč"
+              "name": "PŘÍRODNÍ PEČENÝ KARBANÁTEK, BRAMBOROVÁ KAŠE, ZELNÝ SALÁTEK S MRKVÍ",
+              "price": "185 Kč"
             },
             {
-              "name": "CELÉ KUŘE, KRÉMOVÁ TARHOŇA SE ZELENINOU A ČERSTVÝM KRAVSKÝM SÝREM",
-              "price": "245 Kč"
+              "name": "KUŘE ALA BAŽANT, JASMÍNOVÁ RÝŽE, HRÁŠEK NA MÁSLE",
+              "price": "185 Kč"
             }
           ]
         },
@@ -261,11 +246,7 @@
           "title": "Stálá nabídka",
           "items": [
             {
-              "name": "SMAŽENÝ SÝR, HRANOLKY, TATARSKÁ OMÁČKA, SALÁTEK COLESLAW",
-              "price": "205 Kč"
-            },
-            {
-              "name": "SMAŽENÝ KUŘECÍ ŘÍZEK, ŠŤOUCHANÝ BRAMBOR S MÁSLEM A CIBULKOU, CITRON",
+              "name": "SMAŽENÝ SÝR, HRANOLKY, TATARSKÁ OMÁČKA, ZELNÝ SALÁTEK S MRKVÍ",
               "price": "205 Kč"
             }
           ]
@@ -281,7 +262,7 @@
         }
       ],
       "ok": true,
-      "status": "Menu načteno (12 položek)",
+      "status": "Menu načteno (11 položek)",
       "error": ""
     },
     {
@@ -327,7 +308,7 @@
               "price": "178 Kč"
             },
             {
-              "name": "Pollo alla vercruzana – kuře pečené v tomatové omáčce s olivami a zeleninou",
+              "name": "Pollo alla vercruzana – kuřecí vykostěné stehno dušené v tomatové omáčce s olivami a zeleninou",
               "price": "178 Kč"
             },
             {
@@ -367,39 +348,14 @@
           "title": "Polévka",
           "items": [
             {
-              "name": "Bramborový krém s parmazánem",
+              "name": "Slepičí vývar",
               "price": "55 Kč / 65 Kč"
-            }
-          ]
-        },
-        {
-          "title": "Hlavní jídla",
-          "items": [
-            {
-              "name": "Náš burger, hovězí krk, slanina, čedar, rajče, okurka, salát, chilli majonéza, hranolky",
-              "price": "205 Kč"
-            },
-            {
-              "name": "Kuřecí supreme, zeleninová rýže, tymiánová omáčka",
-              "price": "198 Kč"
-            },
-            {
-              "name": "Pomalu pečený bůček na černém pivu, šťouchané brambory se zelím",
-              "price": "193 Kč"
-            },
-            {
-              "name": "Těstovinový salát se smaženým hermelínem, jogurtový dresink",
-              "price": "179 Kč"
-            },
-            {
-              "name": "Svíčková, hovězí maso, houskový knedlík, brusinky",
-              "price": "195 Kč"
             }
           ]
         }
       ],
       "ok": true,
-      "status": "Menu načteno (6 položek)",
+      "status": "Menu načteno (1 položek)",
       "error": ""
     }
   ]
